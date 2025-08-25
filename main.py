@@ -26,10 +26,22 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    # Check if message is a reply
+    reply_content = None
+    if message.reference and message.reference.message_id:
+        try:
+            replied_message = await message.channel.fetch_message(
+                message.reference.message_id
+            )
+            reply_content = replied_message.content or ""
+        except:
+            reply_content = None
+
     payload = {
         "username": str(message.author),
         "content": message.content or "",
         "channel": str(message.channel.id),
+        "reply_content": reply_content,
         "attachments": (
             [att.url for att in message.attachments] if message.attachments else []
         ),
