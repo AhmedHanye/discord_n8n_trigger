@@ -3,8 +3,6 @@ services:
     build: .
     container_name: discord-n8n-trigger
     restart: unless-stopped
-    env_file:
-      - .env
     security_opt:
       - no-new-privileges:true
     cap_drop:
