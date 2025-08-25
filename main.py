@@ -29,7 +29,7 @@ async def on_message(message):
     payload = {
         "username": str(message.author),
         "content": message.content or "",
-        "channel": message.channel.id,
+        "channel": str(message.channel.id),
         "attachments": (
             [att.url for att in message.attachments] if message.attachments else []
         ),
