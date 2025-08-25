@@ -12,11 +12,14 @@ N8N_WEBHOOK_URL = os.getenv("N8N_WEBHOOK_URL") or ""
 
 intents = discord.Intents.default()
 intents.messages = True
+intents.message_content = True
 client = discord.Client(intents=intents)
+
 
 @client.event
 async def on_ready():
-    print(f'Logged in as {client.user}')
+    print(f"Logged in as {client.user}")
+
 
 @client.event
 async def on_message(message):
@@ -25,9 +28,11 @@ async def on_message(message):
 
     payload = {
         "username": str(message.author),
-        "content": message.content,
-        "channel": str(message.channel),
-        "server": str(message.guild)
+        "content": message.content or "",
+        "channel": message.channel.id,
+        "attachments": (
+            [att.url for att in message.attachments] if message.attachments else []
+        ),
     }
 
     # Send to n8n webhook
@@ -35,5 +40,6 @@ async def on_message(message):
         requests.post(N8N_WEBHOOK_URL, json=payload)
     except Exception as e:
         print("Error sending to n8n:", e)
+
 
 client.run(DISCORD_TOKEN)
