@@ -8,7 +8,8 @@ load_dotenv()
 
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN") or ""
 N8N_WEBHOOK_URL = os.getenv("N8N_WEBHOOK_URL") or ""
-USER = os.getenv("USER") or ""
+N8N_BASIC_AUTH_USER = os.getenv("N8N_BASIC_AUTH_USER") or ""
+N8N_BASIC_AUTH_PASSWORD = os.getenv("N8N_BASIC_AUTH_PASSWORD") or ""
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -50,7 +51,15 @@ async def on_message(message) -> None:
 
     # * Send to n8n webhook
     try:
-        requests.post(N8N_WEBHOOK_URL, json=payload)
+        requests.post(
+            N8N_WEBHOOK_URL,
+            json=payload,
+            auth=(
+                (N8N_BASIC_AUTH_USER, N8N_BASIC_AUTH_PASSWORD)
+                if N8N_BASIC_AUTH_USER and N8N_BASIC_AUTH_PASSWORD
+                else None
+            ),
+        )
     except Exception as e:
         print("Error sending to n8n:", e)
 
