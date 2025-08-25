@@ -3,12 +3,12 @@ import requests
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
+# * Load environment variables from .env file
 load_dotenv()
 
-# Load from env
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN") or ""
 N8N_WEBHOOK_URL = os.getenv("N8N_WEBHOOK_URL") or ""
+USER = os.getenv("USER") or ""
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -17,16 +17,17 @@ client = discord.Client(intents=intents)
 
 
 @client.event
-async def on_ready():
+async def on_ready() -> None:
     print(f"Logged in as {client.user}")
 
 
 @client.event
-async def on_message(message):
-    if message.author == client.user:
+async def on_message(message) -> None:
+    # ! Ignore messages not from the specified user or any bots
+    if getattr(message.author, "bot", False):
         return
 
-    # Check if message is a reply
+    # * Check if message is a reply
     reply_content = None
     if message.reference and message.reference.message_id:
         try:
@@ -47,7 +48,7 @@ async def on_message(message):
         ),
     }
 
-    # Send to n8n webhook
+    # * Send to n8n webhook
     try:
         requests.post(N8N_WEBHOOK_URL, json=payload)
     except Exception as e:
