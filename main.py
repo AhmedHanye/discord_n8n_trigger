@@ -39,11 +39,17 @@ async def on_message(message) -> None:
         except:
             reply_content = None
 
+    # * Thread starter message
+    thread_message = None
+    if isinstance(message.channel, discord.Thread):
+        thread_message = await message.channel.parent.fetch_message(message.channel.id)  # type: ignore
+
     payload = {
         "username": str(message.author),
         "content": message.content or "",
         "channel": str(message.channel.id),
         "reply_content": reply_content,
+        "thread_starter_message": thread_message.content if thread_message else None,
         "attachments": (
             [att.url for att in message.attachments] if message.attachments else []
         ),
