@@ -2,7 +2,12 @@
 ![alt text](images/project.png)
 
 # Guide
-This guide will help you set up and use the Discord N8N Trigger.
+This guide will help you set up and use this simple Discord n8n message trigger.
+- [N8N Setup](#n8n-setup)
+- [Discord Bot Setup](#discord-bot-setup)
+- [Workflow Setup](#workflow-setup)
+- [Deploy the Trigger](#deploy-the-trigger)
+- [Contributing](#contributing)
 
 ## N8N Setup
 
@@ -20,12 +25,26 @@ This guide will help you set up and use the Discord N8N Trigger.
 ## Workflow Setup
 
 1. Create a new workflow in n8n.
-2. Add a Discord Trigger node to your workflow.
-3. Configure the trigger with your Discord bot token and other settings and credentials.
-4. Add additional nodes to process the incoming Discord messages as needed.
+2. Configure the webhook node to receive messages from Discord Trigger.
+    - Set the HTTP Method to POST.
+    - Set credentials for the webhook
+3. Configure the rest of the workflow as needed.
 
 ## Deploy the Trigger
 
-1. Save your workflow in n8n.
-2. Start the n8n instance to listen for incoming Discord events.
-3. Test the trigger by sending a message in the Discord channel where the bot is present.
+1. Create a `.env` file in the root of your project and add the following environment variables:
+   ```
+   DISCORD_TOKEN=your_discord_bot_token
+   N8N_WEBHOOK_URL=your_n8n_webhook_url
+   N8N_BASIC_AUTH_USER=your_n8n_username
+   N8N_BASIC_AUTH_PASSWORD=your_n8n_password
+   ```
+2. Build and run the Docker container using Docker Compose:
+   ```bash
+   docker-compose up -d
+   ```
+3. Verify that the bot is running and connected to your Discord server.
+4. Test the trigger by sending a message in the Discord channel where the bot is present.
+
+## Contributing
+Contributions are welcome! Please open an issue or submit a pull request for any changes you'd like to make.
