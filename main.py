@@ -65,7 +65,7 @@ async def ask_command(interaction: discord.Interaction, question: str):
                 if N8N_BASIC_AUTH_USER and N8N_BASIC_AUTH_PASSWORD
                 else None
             ),
-            timeout=10,  # avoid hanging
+            timeout=25,  # avoid hanging
         )
 
         # * Get reply text from JSON response
