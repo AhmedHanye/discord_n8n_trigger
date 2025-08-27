@@ -15,9 +15,5 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    networks:
-      - n8n_net
-  
-  networks:
-    n8n_net:
-      external: true
+    extra_hosts:
+      - "n8n.ahmedhanye.me:host-gateway"
