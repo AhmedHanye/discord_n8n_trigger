@@ -19,6 +19,5 @@ services:
       - n8n_net
   
   networks:
-    n8n_network:
+    n8n_net:
       external: true
-      name: n8n_net
