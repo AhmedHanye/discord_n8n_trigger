@@ -17,18 +17,20 @@ intents.message_content = True
 client = discord.Client(intents=intents)
 
 
+# * Log when bot is ready
 @client.event
 async def on_ready() -> None:
     print(f"Logged in as {client.user}")
 
 
+# * Response to each message
 @client.event
 async def on_message(message) -> None:
-    # ! Ignore messages not from the specified user or any bots
+    # ! Ignore messages from bots
     if getattr(message.author, "bot", False):
         return
 
-    # * Check if message is a reply
+    # * Get reply message content if it exists
     reply_content = None
     if message.reference and message.reference.message_id:
         try:
@@ -39,11 +41,15 @@ async def on_message(message) -> None:
         except:
             reply_content = None
 
-    # * Thread starter message
+    # * Get Thread starter message if it exists
     thread_message = None
     if isinstance(message.channel, discord.Thread):
-        thread_message = await message.channel.parent.fetch_message(message.channel.id)  # type: ignore
+        try:
+            thread_message = await message.channel.parent.fetch_message(message.channel.id)  # type: ignore
+        except:
+            thread_message = None
 
+    # * Prepare payload
     payload = {
         "username": str(message.author),
         "content": message.content or "",
@@ -55,19 +61,34 @@ async def on_message(message) -> None:
         ),
     }
 
-    # * Send to n8n webhook
-    try:
-        requests.post(
-            N8N_WEBHOOK_URL,
-            json=payload,
-            auth=(
-                (N8N_BASIC_AUTH_USER, N8N_BASIC_AUTH_PASSWORD)
-                if N8N_BASIC_AUTH_USER and N8N_BASIC_AUTH_PASSWORD
-                else None
-            ),
-        )
-    except Exception as e:
-        print("Error sending to n8n:", e)
+    # * Show typing indicator while waiting for webhook
+    async with message.channel.typing():
+        # * Send payload to n8n webhook
+        try:
+            response = requests.post(
+                N8N_WEBHOOK_URL,
+                json=payload,
+                auth=(
+                    (N8N_BASIC_AUTH_USER, N8N_BASIC_AUTH_PASSWORD)
+                    if N8N_BASIC_AUTH_USER and N8N_BASIC_AUTH_PASSWORD
+                    else None
+                ),
+                timeout=10,  # avoid hanging
+            )
+
+            # * Get reply text from JSON response
+            try:
+                reply_text = response.json()[0]["reply"]
+
+                # If we got a reply, send it back to Discord
+                if reply_text:
+                    await message.channel.send(reply_text)
+
+            except Exception:
+                await message.channel.send("Couldn't parse response.")
+
+        except Exception as e:
+            await message.channel.send(f"Error: {str(e)}")
 
 
 client.run(DISCORD_TOKEN)
