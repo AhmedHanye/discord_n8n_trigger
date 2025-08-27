@@ -15,3 +15,10 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    networks:
+      - n8n_net
+  
+  networks:
+    n8n_network:
+      external: true
+      name: n8n_net
