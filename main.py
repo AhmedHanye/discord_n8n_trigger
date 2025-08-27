@@ -51,7 +51,7 @@ async def on_message(message) -> None:
 
     # * Prepare payload
     payload = {
-        "username": str(message.author),
+        "username": message.author.display_name,
         "content": message.content or "",
         "channel": str(message.channel.id),
         "reply_content": reply_content,
