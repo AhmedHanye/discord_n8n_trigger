@@ -26,8 +26,18 @@ async def on_ready() -> None:
 # * Response to each message
 @client.event
 async def on_message(message) -> None:
-    # ! Ignore messages from bots
-    if getattr(message.author, "bot", False):
+    """
+        # ! Ignore messages:
+            - it must be the default message (normal user messages)
+            - From bots
+            - one of these values empty (author - content)
+    """
+    if (
+        message.type != discord.MessageType.default
+        or getattr(message.author, "bot", False)
+        or not message.author
+        or not message.content
+    ):
         return
 
     # * Get reply message content if it exists
